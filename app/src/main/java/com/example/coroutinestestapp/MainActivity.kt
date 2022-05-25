@@ -1,13 +1,14 @@
 package com.example.coroutinestestapp
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.example.coroutinestestapp.databinding.ActivityMainBinding
-import kotlin.concurrent.thread
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadData() {
+    private suspend fun loadData() {
         binding.progressBar.isVisible = true
         binding.buttonDownload.isEnabled = false
         val city = loadCity()
