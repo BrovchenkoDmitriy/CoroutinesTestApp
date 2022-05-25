@@ -1,7 +1,6 @@
 package com.example.coroutinestestapp
 
 import android.os.Bundle
-import android.os.ProxyFileDescriptorCallback
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -9,11 +8,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.coroutinestestapp.databinding.ActivityMainBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
+
 
 
 class MainActivity : AppCompatActivity() {
-
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -28,19 +26,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-//    private fun loadDateWithoutCorountines(){
-//        loadCityWithoutCorountines {
-//            binding.tvLocation.text = it
-//        }
-//    }
-//
-//    private fun loadCityWithoutCorountines( callback: (String) -> Unit){
-//        thread {
-//            Thread.sleep(5000)
-//           callback.invoke("Moscow")
-//        }
-//    }
 
     private suspend fun loadData() {
         binding.progressBar.isVisible = true
