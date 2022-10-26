@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.coroutinestestapp.databinding.ActivityMainBinding
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -21,8 +23,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.buttonDownload.setOnClickListener {
+            binding.progressBar.isVisible = true
+            binding.buttonDownload.isEnabled = false
+            val deferredCity: Deferred<String> = lifecycleScope.async {
+                val city = loadCity()
+                binding.tvLocation.text = city
+                city
+            }
+            val deferredTemp: Deferred<Int> = lifecycleScope.async {
+                val temp = loadTemp()
+                binding.tvTemperature.text = temp.toString()
+                temp
+            }
             lifecycleScope.launch {
-                loadData()
+                val city = deferredCity.await()
+                val temp = deferredTemp.await()
+
+                binding.progressBar.isVisible = false
+                binding.buttonDownload.isEnabled = true
+                Toast.makeText(
+                    this@MainActivity,
+                    "City $city  Temp $temp",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -32,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         binding.buttonDownload.isEnabled = false
         val city = loadCity()
         binding.tvLocation.text = city
-        val temp = loadTemp(city)
+        val temp = loadTemp()
         binding.tvTemperature.text = temp.toString()
         binding.progressBar.isVisible = false
         binding.buttonDownload.isEnabled = true
@@ -43,13 +66,8 @@ class MainActivity : AppCompatActivity() {
         return "Moscow"
     }
 
-    private suspend fun loadTemp(city: String): Int {
-        Toast.makeText(
-            this,
-            "Loading temperature for city: $city",
-            Toast.LENGTH_SHORT
-        ).show()
-        delay(5000)
+    private suspend fun loadTemp(): Int {
+        delay(3000)
         return 17
     }
 }
