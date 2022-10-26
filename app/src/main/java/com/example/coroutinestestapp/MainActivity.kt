@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.coroutinestestapp.databinding.ActivityMainBinding
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -23,19 +25,27 @@ class MainActivity : AppCompatActivity() {
         binding.buttonDownload.setOnClickListener {
             binding.progressBar.isVisible = true
             binding.buttonDownload.isEnabled = false
-            val jobCity = lifecycleScope.launch {
+            val deferredCity: Deferred<String> = lifecycleScope.async {
                 val city = loadCity()
                 binding.tvLocation.text = city
+                city
             }
-            val jobTemp = lifecycleScope.launch {
+            val deferredTemp: Deferred<Int> = lifecycleScope.async {
                 val temp = loadTemp()
                 binding.tvTemperature.text = temp.toString()
+                temp
             }
             lifecycleScope.launch {
-                jobCity.join()
-                jobTemp.join()
+                val city = deferredCity.await()
+                val temp = deferredTemp.await()
+
                 binding.progressBar.isVisible = false
                 binding.buttonDownload.isEnabled = true
+                Toast.makeText(
+                    this@MainActivity,
+                    "City $city  Temp $temp",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
