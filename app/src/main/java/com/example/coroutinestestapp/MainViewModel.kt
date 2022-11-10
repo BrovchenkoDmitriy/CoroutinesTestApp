@@ -8,9 +8,9 @@ import kotlin.concurrent.thread
 
 class MainViewModel : ViewModel() {
 
-    private val parentJob = Job()
+    private val parentJob = SupervisorJob()
 
-    private val exceptionHandler = CoroutineExceptionHandler{_, throwable ->
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.d(LOG_TAG, "Exception caught $throwable")
     }
 
@@ -28,11 +28,13 @@ class MainViewModel : ViewModel() {
         }
 
         val childJob2 = coroutineScope.launch {
-            delay(2000)
-            error()
-            // in this moment exception will be forwarded to the parent coroutine
-            // where it will be processed exceptionHandler
-            // and other child coroutines will be canceled (it depends  on the type of Job)
+            val childJob4 = coroutineScope.async {
+                delay(2000)
+                error()
+                Log.d(LOG_TAG, "Fourth coroutines finished ")
+
+            }
+            delay(2500)
             Log.d(LOG_TAG, "Second coroutines finished ")
         }
 
